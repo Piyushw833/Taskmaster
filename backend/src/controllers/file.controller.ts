@@ -11,10 +11,11 @@ export class FileController {
    * Upload a file
    * POST /api/files/upload
    */
-  async uploadFile(req: AuthenticatedRequest, res: Response) {
+  async uploadFile(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'No file provided' });
+        res.status(400).json({ error: 'No file provided' });
+        return;
       }
 
       const file = req.file.buffer || Readable.from(req.file.stream);
@@ -37,10 +38,11 @@ export class FileController {
    * Create a new version of a file
    * POST /api/files/:id/versions
    */
-  async createVersion(req: AuthenticatedRequest, res: Response) {
+  async createVersion(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'No file provided' });
+        res.status(400).json({ error: 'No file provided' });
+        return;
       }
 
       const file = req.file.buffer || Readable.from(req.file.stream);
@@ -62,12 +64,13 @@ export class FileController {
    * Share a file with another user
    * POST /api/files/:id/share
    */
-  async shareFile(req: AuthenticatedRequest, res: Response) {
+  async shareFile(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { userId, permission, expiresAt } = req.body;
       
       if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
+        res.status(400).json({ error: 'User ID is required' });
+        return;
       }
 
       const result = await storageService.shareFile(
@@ -89,7 +92,7 @@ export class FileController {
    * Update file share settings
    * PATCH /api/files/shares/:shareId
    */
-  async updateShare(req: AuthenticatedRequest, res: Response) {
+  async updateShare(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { permission, expiresAt } = req.body;
       
@@ -113,7 +116,7 @@ export class FileController {
    * Remove file share
    * DELETE /api/files/shares/:shareId
    */
-  async removeShare(req: AuthenticatedRequest, res: Response) {
+  async removeShare(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       await storageService.removeFileShare(req.params.shareId, req.user.id);
       res.status(204).send();
@@ -127,12 +130,13 @@ export class FileController {
    * Update file tags
    * PATCH /api/files/:id/tags
    */
-  async updateTags(req: AuthenticatedRequest, res: Response) {
+  async updateTags(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { tags } = req.body;
       
       if (!tags || typeof tags !== 'object') {
-        return res.status(400).json({ error: 'Tags must be an object' });
+        res.status(400).json({ error: 'Tags must be an object' });
+        return;
       }
 
       const result = await storageService.updateFileTags(
@@ -152,7 +156,7 @@ export class FileController {
    * Search files
    * GET /api/files/search
    */
-  async searchFiles(req: AuthenticatedRequest, res: Response) {
+  async searchFiles(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { name, mimeType, tags, status, sharedWithMe } = req.query;
       
@@ -175,7 +179,7 @@ export class FileController {
    * Get file download URL
    * GET /api/files/:key/url
    */
-  async getFileUrl(req: AuthenticatedRequest, res: Response) {
+  async getFileUrl(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const url = await storageService.getFileUrl(req.params.key);
       res.status(200).json({ url });
@@ -189,7 +193,7 @@ export class FileController {
    * Delete file
    * DELETE /api/files/:key
    */
-  async deleteFile(req: AuthenticatedRequest, res: Response) {
+  async deleteFile(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       await storageService.deleteFile(req.params.key);
       res.status(204).send();
@@ -203,7 +207,7 @@ export class FileController {
    * List files
    * GET /api/files
    */
-  async listFiles(req: AuthenticatedRequest, res: Response) {
+  async listFiles(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const files = await storageService.listFiles();
       res.status(200).json(files);
@@ -217,21 +221,27 @@ export class FileController {
    * Get file preview (image thumbnail or PDF first page)
    * GET /api/files/:id/preview
    */
-  async getFilePreview(req: AuthenticatedRequest, res: Response) {
+  async getFilePreview(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const file = await storageService.getFileById(req.params.id);
-      if (!file) return res.status(404).json({ error: 'File not found' });
+      if (!file) {
+        res.status(404).json({ error: 'File not found' });
+        return;
+      }
       if (file.mimeType.startsWith('image/')) {
         // Generate thumbnail for image
         const buffer = await storageService.getFileBuffer(file.key);
         const thumbnail = await sharp(buffer).resize(200, 200, { fit: 'inside' }).toBuffer();
         res.set('Content-Type', 'image/png');
-        return res.send(thumbnail);
+        res.send(thumbnail);
+        return;
       } else if (file.mimeType === 'application/pdf') {
         // TODO: Implement PDF preview (first page as image)
-        return res.status(501).json({ error: 'PDF preview not implemented yet' });
+        res.status(501).json({ error: 'PDF preview not implemented yet' });
+        return;
       } else {
-        return res.status(415).json({ error: 'Preview not supported for this file type' });
+        res.status(415).json({ error: 'Preview not supported for this file type' });
+        return;
       }
     } catch (error) {
       console.error('Error generating preview:', error);
@@ -243,11 +253,12 @@ export class FileController {
    * Update file category
    * PATCH /api/files/:id/category
    */
-  async updateCategory(req: AuthenticatedRequest, res: Response) {
+  async updateCategory(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { category } = req.body;
       if (!category || typeof category !== 'string') {
-        return res.status(400).json({ error: 'Category must be a string' });
+        res.status(400).json({ error: 'Category must be a string' });
+        return;
       }
       const updated = await storageService.updateFileCategory(req.params.id, req.user.id, category);
       res.status(200).json(updated);
@@ -261,11 +272,12 @@ export class FileController {
    * Batch delete files
    * POST /api/files/batch-delete
    */
-  async batchDelete(req: AuthenticatedRequest, res: Response) {
+  async batchDelete(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { fileIds } = req.body;
       if (!Array.isArray(fileIds) || fileIds.length === 0) {
-        return res.status(400).json({ error: 'fileIds must be a non-empty array' });
+        res.status(400).json({ error: 'fileIds must be a non-empty array' });
+        return;
       }
       const result = await storageService.batchDeleteFiles(fileIds, req.user.id);
       res.status(200).json(result);
@@ -279,14 +291,16 @@ export class FileController {
    * Batch update tags
    * POST /api/files/batch-tag
    */
-  async batchTag(req: AuthenticatedRequest, res: Response) {
+  async batchTag(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { fileIds, tags } = req.body;
       if (!Array.isArray(fileIds) || fileIds.length === 0) {
-        return res.status(400).json({ error: 'fileIds must be a non-empty array' });
+        res.status(400).json({ error: 'fileIds must be a non-empty array' });
+        return;
       }
       if (!tags || typeof tags !== 'object') {
-        return res.status(400).json({ error: 'tags must be an object' });
+        res.status(400).json({ error: 'tags must be an object' });
+        return;
       }
       const result = await storageService.batchUpdateTags(fileIds, req.user.id, tags);
       res.status(200).json(result);

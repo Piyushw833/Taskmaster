@@ -33,19 +33,24 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
-    
+        cache-dependency-path: backend/package-lock.json
+
     - name: Install dependencies
       run: npm ci
-    
+      working-directory: backend
+
     - name: Run linting
       run: npm run lint
-    
+      working-directory: backend
+
     - name: Run tests
       run: npm test
+      working-directory: backend
       env:
         NODE_ENV: test
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/oculis_test
         JWT_SECRET: test-secret
-    
+
     - name: Build
-      run: npm run build 
+      run: npm run build
+      working-directory: backend 

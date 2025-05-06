@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  AGENT
+  USER
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  name              String
+  role              UserRole  @default(USER)
+  twoFactorSecret   String?
+  isTwoFactorEnabled Boolean  @default(false)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastLoginAt       DateTime?
+  files             File[]
+  fileVersions      FileVersion[]
+  sharedFiles       FileShare[]    @relation("shared_with")
+  filesSharedByMe   FileShare[]    @relation("shared_by")
+}
+
+enum FileStatus {
+  ACTIVE
+  DELETED
+  ARCHIVED
+  QUARANTINED
+}
+
+enum ScanStatus {
+  PENDING
+  SCANNING
+  CLEAN
+  INFECTED
+  ERROR
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
+  ADMIN
+}
+
+model FileVersion {
+  id          String      @id @default(cuid())
+  file        File        @relation(fields: [fileId], references: [id])
+  fileId      String
+  key         String      @unique
+  size        Int
+  uploadedBy  User        @relation(fields: [userId], references: [id])
+  userId      String
+  uploadedAt  DateTime    @default(now())
+  scanStatus  ScanStatus  @default(PENDING)
+  scanResult  Json?
+  versionNumber Int
+  changeDescription String?
+
+  @@index([fileId])
+  @@index([userId])
+}
+
+model FileShare {
+  id          String      @id @default(cuid())
+  file        File        @relation(fields: [fileId], references: [id])
+  fileId      String
+  sharedWith  User        @relation("shared_with", fields: [userId], references: [id])
+  userId      String
+  sharedBy    User        @relation("shared_by", fields: [sharedById], references: [id])
+  sharedById  String
+  permission  SharePermission @default(VIEW)
+  sharedAt    DateTime    @default(now())
+  expiresAt   DateTime?
+
+  @@unique([fileId, userId])
+  @@index([fileId])
+  @@index([userId])
+  @@index([sharedById])
+}
+
+model File {
+  id          String      @id @default(cuid())
+  key         String      @unique
+  name        String
+  size        Int
+  mimeType    String
+  uploadedBy  User        @relation(fields: [userId], references: [id])
+  userId      String
+  uploadedAt  DateTime    @default(now())
+  lastAccessed DateTime?
+  tags        Json?       @default("{}")
+  status      FileStatus  @default(ACTIVE)
+  scanStatus  ScanStatus  @default(PENDING)
+  scanResult  Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  currentVersion Int      @default(1)
+  versions    FileVersion[]
+  sharedWith  FileShare[]
+  category    String?    @default("uncategorized") // File category (e.g., document, image, video, 3d-model)
+
+  @@index([userId])
+  @@index([status])
+  @@index([scanStatus])
+} 

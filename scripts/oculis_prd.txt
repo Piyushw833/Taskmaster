@@ -1,0 +1,160 @@
+<context>
+# Overview  
+Oculis is an AI-powered, smart real estate platform that centralizes 3D property scans, documents, and analytics into one immersive, interactive dashboard. Designed for real estate agents, developers, buyers, and investors, it helps streamline property evaluation, contract handling, and decision-making using 3D digital twins, GPT-based agents, and secure cloud collaboration.
+
+By merging visualization, valuation, and virtual interaction, Oculis solves the inefficiencies of traditional property workflows and enhances clarity, accessibility, and speed throughout the real estate lifecycle.
+
+# Core Features  
+- 3D Digital Twin Viewer  
+  - Explore interactive 3D property models (.OBJ, etc.) in-browser.  
+  - Eliminates need for physical site visits and enhances buyer trust.  
+  - Built with Three.js or CesiumJS and supports multiple media formats.
+
+- AI Agent Suite  
+  - Includes agents for ROI simulation, contract parsing, and valuation.  
+  - Speeds up analysis of documents and pricing insights.  
+  - Powered by OpenAI APIs and vector search tools like Pinecone or AWS OpenSearch.
+
+- Secure Cloud File Management  
+  - Upload and share files (PDFs, images, videos, 3D scans) with role-based permissions.  
+  - Uses time-based encrypted URLs and RBAC access.  
+  - Integrated via AWS S3 / Google Cloud with KMS encryption.
+
+- Web + Mobile Dashboard  
+  - Modern responsive dashboard for desktop and mobile (PWA).  
+  - Built with React, Tailwind, and Apollo GraphQL.  
+  - Offers quick access to listings, notifications, and analytics.
+
+- Real-Time Collaboration (Future Phase) 
+  - Commenting, in-app chat, and feedback on property assets.  
+  - Powered by WebRTC and socket integration (post-MVP).
+
+- AI-Powered Insights & Analytics  
+  - Track document views, property interest, engagement score.  
+  - Predict likelihood of deal closure based on interaction data.  
+  - Dashboard visualizations via modern BI tools.
+
+# User Experience  
+- User Personas  
+  - Buyer: Wants immersive view, valuation insights, and access to verified documents.  
+  - Agent: Uploads listings, shares files securely, and manages property visibility.  
+  - Builder/Seller: Tracks listing performance, configures access, and evaluates interest.  
+
+- Key User Flows  
+  - Buyer explores digital twin → reviews valuation → downloads documents → contacts agent  
+  - Agent uploads property → sets roles & permissions → shares link with buyers  
+  - Seller/developer monitors analytics → updates pricing → gets AI-driven ROI projections
+
+- UI/UX Considerations  
+  - Simple, intuitive layout for both technical and non-technical users  
+  - Mobile-first approach with real-time sync and alerts  
+  - Role-based interface customization for buyer, agent, and admin
+</context>
+
+<PRD>
+# Technical Architecture  
+- System Components  
+  - Frontend: React.js, TailwindCSS, Apollo Client (GraphQL)  
+  - Backend: Node.js / FastAPI (Python), REST + GraphQL  
+  - 3D Viewer: Three.js / CesiumJS  
+  - AI Layer: OpenAI GPT APIs for agent logic, Pinecone for embeddings  
+  - Storage: AWS S3 / GCP Buckets for files & 3D models  
+  - Auth & Security: OAuth 2.0, OpenID Connect, RBAC, AWS KMS encryption  
+  - Containerization: Docker & Kubernetes  
+  - Monitoring: Prometheus, Grafana, ELK Stack  
+
+- Data Models:  
+  - Users: Roles include buyer, agent, admin  
+  - Properties: Title, location, media, 3D model, valuation score, tags  
+  - Documents: File name, format, access level, URL, expiry  
+  - Interactions: Views, comments, shares, engagement metrics  
+  - Agent Logs: AI query requests, outputs, timestamps  
+
+- APIs and Integrations:  
+  - GPT/LLM API for insights, parsing, and valuation  
+  - Map APIs for geo-visual overlays (Google Maps/Cesium)  
+  - Payment APIs (Stripe or Razorpay) for listing upgrades (future)  
+  - Cloud storage and email (AWS SES) for link-based sharing
+
+# Development Roadmap  
+- MVP Scope  
+  - Auth and user management  
+  - Property upload and digital twin viewer  
+  - File sharing with secure access  
+  - AI agent integration for valuation, contract parsing, ROI  
+  - Mobile-responsive web dashboard  
+  - Basic engagement analytics and insights
+
+- Post-MVP Enhancements  
+  - Real-time chat and collaboration  
+  - Predictive scoring for buyer intent  
+  - Deal matching assistant (AI)  
+
+# Logical Dependency Chain  
+- Auth and role setup → file upload and storage → 3D viewer integration  
+- AI agent backend → frontend triggers → secure link generation  
+- Mobile access + dashboards → analytics engine → chat + recommendations  
+
+# Risks and Mitigations  
+- Large 3D file performance: Use compression and progressive streaming  
+- AI latency/cost: Use batching and caching on AI agent responses  
+- Scope creep: Stick to feature freeze post-wireframe approval  
+- Data security: End-to-end encryption and detailed access logs  
+- Timeline drift: Milestone-based reviews and feedback checkpoints  
+
+# Appendix  
+- Client will provide logos, fonts, test assets (3D, PDF, etc.)  
+- Feedback expected within 48 hours per design iteration  
+- OpenAI billing to be managed by client (or shared key)  
+- All test environments will be hosted in a dev-secure setup  
+- Major revisions limited to one per MVP scope
+
+# Performance Requirements  
+- Page load time: < 2 seconds  
+- 3D model initial load: < 5 seconds  
+- AI response time: < 3 seconds  
+- System uptime: 99.9%  
+
+# Security Requirements  
+- Password policy: Minimum 10 characters, 1 uppercase letter, 1 number, 1 special character  
+- Two-Factor Authentication (2FA): Email OTP or Authenticator App  
+- Audit logs: Retained for a minimum of 12 months  
+- Data backup: Scheduled every 24 hours with secure storage  
+
+# Testing Strategy  
+- Unit Testing: Minimum 80% backend and frontend test coverage  
+- Integration Testing: Verification of complete workflows across modules  
+- Load Testing: Simulate up to 5,000 concurrent sessions across major features  
+- User Acceptance Testing (UAT): Carried out with key personas (buyer, agent); success criteria based on zero critical bugs and >90% user satisfaction  
+
+# Deployment Strategy  
+- CI/CD: GitHub Actions with Docker containers and Kubernetes orchestration  
+- Environment Setup:  
+  - Development  
+  - Staging (UAT)  
+  - Production  
+- Rollback Strategy: Docker image versioning with immediate rollback support via Kubernetes  
+- Monitoring Tools: Prometheus for metrics, Grafana dashboards, ELK stack for logging  
+
+# Resource Requirements  
+- Team Composition:  
+  - 1 Product Manager  
+  - 2 Frontend Developers  
+  - 2 Backend Developers  
+  - 1 AI/ML Engineer  
+  - 1 DevOps Engineer  
+  - 1 QA Engineer  
+
+- Infrastructure Cost Estimates:  
+  - Cloud hosting and storage (AWS/GCP): ~$300/month  
+  - OpenAI API usage: ~$200/month  
+  - Vector DB (Pinecone): ~$50/month  
+  - Monitoring tools: ~$100/month  
+Note: All services listed above (e.g., OpenAI, AWS, Pinecone) are suggested based on performance and developer familiarity. During MVP, equivalent free/open-source or low-cost alternatives (e.g., FAISS for vector DB, Firebase for hosting, GPT-3.5 instead of GPT-4) may be substituted to reduce operational costs. Final deployment stack will be selected based on performance testing and budget.
+
+- Development Timeline Estimates:  
+  - Week 1: UI/UX design and authentication setup, initial 3D viewer integration  
+  - Week 2: Complete 3D viewer integration, file sharing implementation  
+  - Week 3: AI agent backend development, dashboard core features  
+  - Week 4: QA testing, staging deployment, and production release
+</PRD>

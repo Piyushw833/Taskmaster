@@ -1,0 +1,200 @@
+# Oculis Real Estate Platform PRD
+
+## Project Overview
+Oculis is a modern real estate platform that connects property buyers, sellers, and agents. The platform provides a secure, user-friendly interface for property listings, searches, and transactions.
+
+## Technical Stack
+- Backend: Node.js with Express and TypeScript
+- Frontend: React with TypeScript
+- Database: PostgreSQL with Prisma ORM
+- Authentication: JWT with 2FA support
+- Infrastructure: Docker and Docker Compose
+- CI/CD: GitHub Actions
+
+## Core Features
+
+### 1. User Authentication and Authorization
+- Secure user registration and login system
+- Two-factor authentication (2FA) support
+- Role-based access control (Admin, Agent, User)
+- JWT-based session management
+- Password hashing and security measures
+
+### 2. Property Management
+- CRUD operations for property listings
+- Rich property details (photos, descriptions, amenities)
+- Property search with filters
+- Property status tracking (Available, Under Contract, Sold)
+- Property verification system
+
+### 3. User Profiles
+- Detailed user profiles for buyers and agents
+- Profile verification system
+- Contact information management
+- Saved searches and favorites
+- Transaction history
+
+### 4. Search and Discovery
+- Advanced property search filters
+- Location-based search
+- Price range filtering
+- Property type categorization
+- Saved search preferences
+
+### 5. Communication System
+- In-app messaging between users
+- Property inquiry system
+- Viewing appointment scheduling
+- Email notifications
+- System notifications
+
+### 6. Admin Dashboard
+- User management
+- Property listing moderation
+- Analytics and reporting
+- System configuration
+- Content management
+
+## Technical Requirements
+
+### Backend Architecture
+- Clean architecture with separation of concerns
+- RESTful API design
+- Comprehensive error handling
+- Request validation
+- API documentation
+- Unit and integration tests
+
+### Frontend Architecture
+- Component-based architecture
+- Responsive design
+- State management with Redux
+- Form validation
+- Error handling
+- Unit tests
+
+### Security Requirements
+- Input validation
+- XSS protection
+- CSRF protection
+- Rate limiting
+- Data encryption
+- Secure file uploads
+
+### Performance Requirements
+- Fast page load times
+- Efficient database queries
+- Image optimization
+- Caching strategy
+- API response time optimization
+
+### Infrastructure
+- Docker containerization
+- CI/CD pipeline
+- Automated testing
+- Monitoring and logging
+- Backup strategy
+
+## Development Phases
+
+### Phase 1: Foundation
+- Project setup and infrastructure
+- User authentication system
+- Basic property management
+- Core API development
+
+### Phase 2: Core Features
+- Property search and filters
+- User profiles
+- Basic messaging system
+- Frontend implementation
+
+### Phase 3: Advanced Features
+- Advanced search capabilities
+- Admin dashboard
+- Analytics integration
+- Enhanced communication features
+
+### Phase 4: Optimization
+- Performance optimization
+- Security enhancements
+- UI/UX improvements
+- Testing and bug fixes
+
+## Success Criteria
+- Secure and reliable authentication system
+- Fast and responsive user interface
+- Efficient property search and management
+- Scalable and maintainable codebase
+- Comprehensive test coverage
+- Positive user feedback
+
+# Authentication and Authorization System PRD
+
+## Project Overview
+Implement a secure authentication and authorization system with role-based access control (RBAC) and two-factor authentication (2FA) support.
+
+## Technical Requirements
+
+### Technology Stack
+- TypeScript
+- Express.js framework
+- Prisma ORM for database operations
+- JWT for authentication
+- otplib for 2FA implementation
+- Clean architecture pattern (controllers, services, routes)
+
+### Core Features
+
+1. User Authentication
+   - User registration with email and password
+   - JWT-based authentication
+   - Two-factor authentication using authenticator apps
+   - Password policy enforcement (10+ chars, uppercase, numbers, special chars)
+   - Secure password hashing and storage
+
+2. User Model
+   - Email (unique identifier)
+   - Password (hashed)
+   - Name
+   - Role (ADMIN, AGENT, CLIENT)
+   - 2FA secret and verification status
+
+3. Role-Based Access Control (RBAC)
+   - Granular permissions for different roles
+   - Permission matrix for user management
+   - Access control for property management
+   - File access permissions
+   - Analytics access control
+
+4. API Endpoints
+   - User registration
+   - User login
+   - 2FA setup and verification
+   - Password reset/recovery
+   - Role and permission management
+   - User profile management
+
+5. Security Features
+   - JWT token validation
+   - Role-based middleware
+   - Permission checking helpers
+   - Rate limiting
+   - Input validation and sanitization
+
+## Implementation Status
+- Project infrastructure setup completed
+- Basic authentication system implemented
+- User model and database schema defined
+- JWT integration completed
+- 2FA implementation in progress
+- RBAC system partially implemented
+
+## Next Steps
+- Complete RBAC implementation
+- Finalize 2FA integration
+- Add rate limiting
+- Implement password recovery
+- Add comprehensive input validation
+- Set up automated testing
+- Add API documentation 

@@ -18,11 +18,11 @@ app.use('/api/auth', authRouter);
 app.use('/api/v1', router);
 
 // Error handling middleware
-app.use((err: Error, req: any, res: any, next: any) => {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  // console.log(`Server is running on port ${port}`);
 }); 

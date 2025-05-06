@@ -1,6 +1,13 @@
 import { User, UserRole } from '@prisma/client';
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
+import 'express';
+
+declare module 'express' {
+  interface Request {
+    user?: JwtPayload;
+  }
+}
 
 export interface RegisterUserDto {
   email: string;
@@ -22,7 +29,7 @@ export interface CustomUser extends JwtPayload {
   id: string;
   role: UserRole;
   email: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Extend Express Request type for authenticated routes
@@ -37,11 +44,4 @@ export interface AuthResponse {
   requiresTwoFactor?: boolean;
 }
 
-// Extend Express Request type to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
-  }
-} 
+// If you need to extend Express.Request, use module augmentation in a separate file or here as needed 

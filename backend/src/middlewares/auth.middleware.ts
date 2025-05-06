@@ -1,19 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { JwtPayload } from '../types/auth';
 import { hasPermission, hasAllPermissions, hasAnyPermission } from '../config/permissions';
 import rateLimit from 'express-rate-limit';
-
-const prisma = new PrismaClient();
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: JwtPayload;
-    }
-  }
-}
 
 // Rate limiting middleware
 export const authRateLimiter = rateLimit({

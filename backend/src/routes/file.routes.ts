@@ -1,7 +1,7 @@
-import { Router, Response, NextFunction, Request } from 'express';
+import { Router, Request } from 'express';
 import { FileController } from '../controllers/file.controller';
 import { upload } from '../middlewares/upload.middleware';
-import { authenticate, authRateLimiter } from '../middlewares/auth.middleware';
+import { authRateLimiter } from '../middlewares/auth.middleware';
 import { AuthenticatedRequest } from '../types/auth';
 
 const router = Router();

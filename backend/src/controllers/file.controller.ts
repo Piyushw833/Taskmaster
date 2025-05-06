@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { StorageService, FileMetadata, FileShareInfo, SharePermission } from '../services/storage.service';
+import { Response } from 'express';
+import { StorageService, SharePermission } from '../services/storage.service';
 import { Readable } from 'stream';
 import { AuthenticatedRequest } from '../types/auth';
 import sharp from 'sharp';

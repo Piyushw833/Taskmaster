@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
-import { authenticate, authorize, requirePermission, authRateLimiter } from '../middlewares/auth.middleware';
-import { UserRole } from '@prisma/client';
+import { authenticate, requirePermission, authRateLimiter } from '../middlewares/auth.middleware';
 import { Permissions } from '../config/permissions';
 
 const router = Router();

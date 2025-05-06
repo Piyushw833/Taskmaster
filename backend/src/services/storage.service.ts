@@ -2,7 +2,6 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
-  ListObjectsV2Command,
   ObjectCannedACL,
   ServerSideEncryption,
 } from '@aws-sdk/client-s3';
@@ -11,7 +10,7 @@ import { s3Client, default as storageConfig } from '../config/storage';
 import { Readable } from 'stream';
 import { createHash } from 'crypto';
 import { PrismaClient, FileStatus, ScanStatus, Prisma } from '@prisma/client';
-import { scanFile, ScanResult } from '../utils/fileScanner';
+import { scanFile } from '../utils/fileScanner';
 
 const prisma = new PrismaClient();
 
@@ -85,7 +84,6 @@ export class StorageService {
     mimeType: string,
     size: number,
     userId: string,
-    onProgress?: (progress: number) => void
   ): Promise<FileMetadata> {
     this.validateFileType(mimeType);
     this.validateFileSize(size);

@@ -23,7 +23,7 @@ app.get('/health', (_req, res) => {
 });
 
 // Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response) => {
+app.use((err: Error, _req: express.Request, res: express.Response) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });

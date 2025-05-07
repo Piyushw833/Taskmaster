@@ -10,7 +10,7 @@ import { s3Client, default as storageConfig } from '../config/storage';
 import { Readable } from 'stream';
 import { createHash } from 'crypto';
 import { PrismaClient, FileStatus, ScanStatus, Prisma, File as PrismaFile, FileVersion as PrismaFileVersion, FileShare as PrismaFileShare, SharePermission } from '@prisma/client';
-import { scanFile } from '../utils/fileScanner';
+import { scanFile, ScanResult } from '../utils/fileScanner';
 
 const prisma = new PrismaClient();
 
@@ -26,7 +26,7 @@ export interface FileMetadata {
   tags?: Record<string, string>;
   status: FileStatus;
   scanStatus: ScanStatus;
-  scanResult?: any;
+  scanResult?: ScanResult;
   currentVersion?: number;
   versions?: FileVersionMetadata[];
   sharedWith?: FileShareInfo[];
@@ -41,7 +41,7 @@ export interface FileVersionMetadata {
   versionNumber: number;
   changeDescription?: string;
   scanStatus: ScanStatus;
-  scanResult?: any;
+  scanResult?: ScanResult;
 }
 
 export interface FileShareInfo {
@@ -231,7 +231,7 @@ export class StorageService {
     // Scan new version
     const scanResult = await scanFile(file, existingFile.name);
     // Create version record
-    const version = await prisma.fileVersion.create({
+    await prisma.fileVersion.create({
       data: {
         fileId,
         key: versionKey,
@@ -504,7 +504,7 @@ export class StorageService {
       tags: file.tags as Record<string, string>,
       status: file.status,
       scanStatus: file.scanStatus,
-      scanResult: file.scanResult,
+      scanResult: file.scanResult ? (file.scanResult as unknown as ScanResult) : undefined,
       currentVersion: file.currentVersion,
       versions: (file.versions ?? []).map((v: PrismaFileVersion) => ({
         id: v.id,
@@ -515,7 +515,7 @@ export class StorageService {
         versionNumber: v.versionNumber,
         changeDescription: v.changeDescription ?? undefined,
         scanStatus: v.scanStatus,
-        scanResult: v.scanResult,
+        scanResult: v.scanResult ? (v.scanResult as unknown as ScanResult) : undefined,
       })),
       sharedWith: (file.sharedWith ?? []).map((s: PrismaFileShare) => ({
         id: s.id,

@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@prisma/client';
-import { JwtPayload } from '../types/auth';
 import { hasPermission, hasAllPermissions, hasAnyPermission } from '../config/permissions';
 import rateLimit from 'express-rate-limit';
+import { CustomUser } from '../types/auth';
 
 // Rate limiting middleware
 export const authRateLimiter = rateLimit({
@@ -25,7 +25,7 @@ export function authenticate(
       throw new Error('Authentication required');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomUser;
     req.user = decoded;
     next();
   } catch (error) {
@@ -33,7 +33,7 @@ export function authenticate(
   }
 }
 
-export function authorize(roles: UserRole[]) {
+export function authorize(roles: UserRole[]): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });
@@ -49,7 +49,7 @@ export function authorize(roles: UserRole[]) {
 }
 
 // New middleware for permission-based access control
-export function requirePermission(permission: string) {
+export function requirePermission(permission: string): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });
@@ -64,7 +64,7 @@ export function requirePermission(permission: string) {
   };
 }
 
-export function requireAllPermissions(permissions: string[]) {
+export function requireAllPermissions(permissions: string[]): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });
@@ -79,7 +79,7 @@ export function requireAllPermissions(permissions: string[]) {
   };
 }
 
-export function requireAnyPermission(permissions: string[]) {
+export function requireAnyPermission(permissions: string[]): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' });

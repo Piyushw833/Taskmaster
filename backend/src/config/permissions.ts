@@ -45,7 +45,7 @@ export const RolePermissions: Record<UserRole, string[]> = {
     Permissions.VIEW_ANALYTICS,
     Permissions.EXPORT_ANALYTICS,
   ],
-  CLIENT: [
+  USER: [
     Permissions.READ_PROPERTY,
     Permissions.LIST_PROPERTIES,
     Permissions.READ_FILE,

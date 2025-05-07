@@ -32,11 +32,8 @@ export class AuthService {
       data: {
         email: userData.email,
         password: hashedPassword,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        role: userData.role || UserRole.CLIENT,
-        phone: userData.phone,
-        company: userData.company
+        name: userData.firstName ? userData.firstName : userData.email, // fallback to email if no name
+        role: userData.role || UserRole.USER
       }
     });
 
@@ -44,13 +41,7 @@ export class AuthService {
     const token = this.generateToken(user);
     
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role
-      },
+      user,
       token
     };
   }
@@ -74,13 +65,7 @@ export class AuthService {
     // Check if 2FA is enabled
     if (user.isTwoFactorEnabled) {
       return {
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role
-        },
+        user,
         token: '',
         requiresTwoFactor: true
       };
@@ -96,13 +81,7 @@ export class AuthService {
     });
 
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role
-      },
+      user,
       token
     };
   }
@@ -165,13 +144,7 @@ export class AuthService {
     });
 
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role
-      },
+      user,
       token: jwtToken
     };
   }
@@ -203,8 +176,7 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         role: true,
         isActive: true,
         isTwoFactorEnabled: true,

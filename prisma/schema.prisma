@@ -1,0 +1,5 @@
+name              String
+firstName         String
+lastName          String
+phone             String?
+company           String? 

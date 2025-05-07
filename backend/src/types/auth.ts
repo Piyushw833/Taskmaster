@@ -12,8 +12,6 @@ declare module 'express' {
 export interface RegisterUserDto {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
   role?: UserRole;
   requiresTwoFactor?: boolean;
 }

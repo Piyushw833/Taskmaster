@@ -44,7 +44,7 @@ export function authorize(roles: UserRole[]): (req: Request, res: Response, next
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    next();
+    return next();
   };
 }
 
@@ -60,7 +60,7 @@ export function requirePermission(permission: string): (req: Request, res: Respo
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
 
-    next();
+    return next();
   };
 }
 
@@ -75,7 +75,7 @@ export function requireAllPermissions(permissions: string[]): (req: Request, res
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
 
-    next();
+    return next();
   };
 }
 
@@ -90,6 +90,6 @@ export function requireAnyPermission(permissions: string[]): (req: Request, res:
       return res.status(403).json({ message: 'Insufficient permissions' });
     }
 
-    next();
+    return next();
   };
 } 

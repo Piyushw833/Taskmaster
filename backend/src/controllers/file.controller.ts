@@ -1,9 +1,9 @@
 import { Response } from 'express';
-import { StorageService, SharePermission } from '../services/storage.service';
+import { StorageService } from '../services/storage.service';
 import { Readable } from 'stream';
 import { AuthenticatedRequest } from '../types/auth';
 import sharp from 'sharp';
-import { FileStatus } from '@prisma/client';
+import { FileStatus, SharePermission } from '@prisma/client';
 
 const storageService = new StorageService();
 

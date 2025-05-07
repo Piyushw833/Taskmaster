@@ -84,7 +84,7 @@ export class AuthController {
     }
   }
 
-  async listUsers(req: Request, res: Response): Promise<Response | void> {
+  async listUsers(_req: Request, res: Response): Promise<Response | void> {
     try {
       const users = await this.authService.listUsers();
       return res.status(200).json(users);

@@ -97,10 +97,10 @@ export class AuthController {
     }
   }
 
-  async updateUserRole(req: Request, res: Response): Promise<Response | void> {
+  async updateUserRole(_req: Request, res: Response): Promise<Response | void> {
     try {
-      const { id } = req.params;
-      const { role } = req.body;
+      const { id } = _req.params;
+      const { role } = _req.body;
       
       if (!Object.values(UserRole).includes(role)) {
         return res.status(400).json({ message: 'Invalid role' });

@@ -17,6 +17,11 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/v1', router);
 
+// Example usage
+app.get('/health', (_req, res) => {
+  res.send('OK');
+});
+
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response) => {
   console.error(err.stack);

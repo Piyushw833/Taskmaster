@@ -208,7 +208,7 @@ export class FileController {
    * List files
    * GET /api/files
    */
-  async listFiles(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async listFiles(_req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const files = await storageService.listFiles();
       res.status(200).json(files);

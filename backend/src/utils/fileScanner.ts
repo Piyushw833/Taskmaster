@@ -78,7 +78,7 @@ function isHighRiskFile(filename: string): boolean {
   return HIGH_RISK_EXTENSIONS.includes(ext);
 }
 
-async function validateFileType(filePath: string, originalName: string): Promise<ScanResult> {
+async function validateFileType(_filePath: string, originalName: string): Promise<ScanResult> {
   const mimeType = lookup(originalName) || 'application/octet-stream';
   const isHighRisk = isHighRiskFile(originalName);
 

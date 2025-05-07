@@ -32,7 +32,7 @@ export class AuthService {
       data: {
         email: userData.email,
         password: hashedPassword,
-        name: userData.firstName ? userData.firstName : userData.email, // fallback to email if no name
+        name: userData.email, // fallback to email as name
         role: userData.role || UserRole.USER
       }
     });

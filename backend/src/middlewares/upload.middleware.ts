@@ -14,8 +14,8 @@ export const upload = multer({
   fileFilter: (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     // Enhanced file type validation
     if (!storageConfig.allowedFileTypes.includes(file.mimetype)) {
-      // Multer's FileFilterCallback accepts (error: Error | null, acceptFile?: boolean)
-      return cb(new Error('File type not allowed'), false);
+      // Multer's FileFilterCallback expects (error: null, acceptFile: boolean) for rejection
+      return cb(null, false);
     }
     cb(null, true);
   },

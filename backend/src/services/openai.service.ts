@@ -13,8 +13,13 @@ export async function askOpenAI(prompt: string): Promise<string> {
       temperature: 0.7,
     });
     return response.choices[0]?.message?.content || '';
-  } catch (error: any) {
-    console.error('OpenAI API error:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    if (typeof error === 'object' && error !== null && 'response' in error && 'message' in error) {
+      // @ts-expect-error: dynamic error shape
+      console.error('OpenAI API error:', error.response?.data || error.message);
+    } else {
+      console.error('OpenAI API error:', error);
+    }
     throw new Error('Failed to get response from OpenAI');
   }
 } 

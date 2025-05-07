@@ -3,6 +3,7 @@ import { StorageService, SharePermission } from '../services/storage.service';
 import { Readable } from 'stream';
 import { AuthenticatedRequest } from '../types/auth';
 import sharp from 'sharp';
+import { FileStatus } from '@prisma/client';
 
 const storageService = new StorageService();
 
@@ -164,7 +165,7 @@ export class FileController {
         name: name as string,
         mimeType: mimeType as string,
         tags: tags ? JSON.parse(tags as string) : undefined,
-        status: status as any,
+        status: status ? (status as FileStatus) : undefined,
         sharedWithMe: sharedWithMe === 'true',
       });
 

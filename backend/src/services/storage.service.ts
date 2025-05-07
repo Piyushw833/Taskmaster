@@ -9,16 +9,10 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { s3Client, default as storageConfig } from '../config/storage';
 import { Readable } from 'stream';
 import { createHash } from 'crypto';
-import { PrismaClient, FileStatus, ScanStatus, Prisma } from '@prisma/client';
+import { PrismaClient, FileStatus, ScanStatus, Prisma, File as PrismaFile, FileVersion as PrismaFileVersion, FileShare as PrismaFileShare, SharePermission } from '@prisma/client';
 import { scanFile } from '../utils/fileScanner';
 
 const prisma = new PrismaClient();
-
-export enum SharePermission {
-  VIEW = 'VIEW',
-  EDIT = 'EDIT',
-  ADMIN = 'ADMIN',
-}
 
 export interface FileMetadata {
   id: string;
@@ -250,7 +244,10 @@ export class StorageService {
       },
     });
     // Return the latest file metadata
-    const updatedFile = await prisma.file.findUnique({ where: { id: fileId } });
+    const updatedFile = await prisma.file.findUnique({ where: { id: fileId }, include: { versions: true, sharedWith: true } });
+    if (!updatedFile) {
+      throw new Error('File not found after creating new version');
+    }
     return this.mapFileToMetadata(updatedFile);
   }
 
@@ -263,6 +260,7 @@ export class StorageService {
   ): Promise<FileShareInfo> {
     const file = await prisma.file.findUnique({
       where: { id: fileId },
+      include: { versions: true, sharedWith: true },
     });
 
     if (!file) {
@@ -289,7 +287,7 @@ export class StorageService {
       sharedById: share.sharedById,
       permission: share.permission,
       sharedAt: share.sharedAt,
-      expiresAt: share.expiresAt,
+      expiresAt: share.expiresAt ?? undefined,
     };
   }
 
@@ -303,13 +301,14 @@ export class StorageService {
   ): Promise<FileShareInfo> {
     const share = await prisma.fileShare.findUnique({
       where: { id: shareId },
+      include: { file: true },
     });
 
     if (!share) {
       throw new Error('Share not found');
     }
 
-    if (share.file.userId !== userId) {
+    if (!share.file || share.file.userId !== userId) {
       throw new Error('Only file owner can update share settings');
     }
 
@@ -324,20 +323,21 @@ export class StorageService {
       sharedById: updatedShare.sharedById,
       permission: updatedShare.permission,
       sharedAt: updatedShare.sharedAt,
-      expiresAt: updatedShare.expiresAt,
+      expiresAt: updatedShare.expiresAt ?? undefined,
     };
   }
 
   async removeFileShare(shareId: string, userId: string): Promise<void> {
     const share = await prisma.fileShare.findUnique({
       where: { id: shareId },
+      include: { file: true },
     });
 
     if (!share) {
       throw new Error('Share not found');
     }
 
-    if (share.file.userId !== userId) {
+    if (!share.file || share.file.userId !== userId) {
       throw new Error('Only file owner can remove share');
     }
 
@@ -369,8 +369,11 @@ export class StorageService {
         tags: tags as unknown as Prisma.InputJsonValue,
         updatedAt: new Date(),
       },
+      include: { versions: true, sharedWith: true },
     });
-
+    if (!updatedFile) {
+      throw new Error('File not found after update');
+    }
     return this.mapFileToMetadata(updatedFile);
   }
 
@@ -384,11 +387,11 @@ export class StorageService {
       sharedWithMe?: boolean;
     }
   ): Promise<FileMetadata[]> {
-    let files: any[] = [];
+    let files: PrismaFile[] = [];
     if (query.sharedWithMe) {
       // Query FileShare for fileIds shared with userId
       const shares = await prisma.fileShare.findMany({ where: { userId } });
-      const fileIds = shares.map((s: any) => s.fileId);
+      const fileIds = shares.map((s: PrismaFileShare) => s.fileId);
       files = await prisma.file.findMany({
         where: {
           id: { in: fileIds },
@@ -411,12 +414,13 @@ export class StorageService {
         orderBy: { updatedAt: 'desc' },
       });
     }
-    return files.map((file) => this.mapFileToMetadata(file));
+    return files.map((file: PrismaFile) => this.mapFileToMetadata(file));
   }
 
   async getFileById(id: string): Promise<FileMetadata | null> {
     const file = await prisma.file.findUnique({
       where: { id },
+      include: { versions: true, sharedWith: true },
     });
     return file ? this.mapFileToMetadata(file) : null;
   }
@@ -446,7 +450,11 @@ export class StorageService {
     const updated = await prisma.file.update({
       where: { id },
       data: { category },
+      include: { versions: true, sharedWith: true },
     });
+    if (!updated) {
+      throw new Error('File not found after update');
+    }
     return this.mapFileToMetadata(updated);
   }
 
@@ -474,7 +482,7 @@ export class StorageService {
       try {
         const file = await prisma.file.findUnique({ where: { id } });
         if (!file || file.userId !== userId) throw new Error('Not found or permission denied');
-        await prisma.file.update({ where: { id }, data: { tags: tags as any } });
+        await prisma.file.update({ where: { id }, data: { tags: tags as Prisma.InputJsonValue } });
         updated.push(id);
       } catch {
         failed.push(id);
@@ -483,7 +491,7 @@ export class StorageService {
     return { updated, failed };
   }
 
-  private mapFileToMetadata(file: any): FileMetadata {
+  private mapFileToMetadata(file: PrismaFile & { versions?: PrismaFileVersion[]; sharedWith?: PrismaFileShare[] }): FileMetadata {
     return {
       id: file.id,
       key: file.key,
@@ -498,7 +506,7 @@ export class StorageService {
       scanStatus: file.scanStatus,
       scanResult: file.scanResult,
       currentVersion: file.currentVersion,
-      versions: file.versions?.map((v: any) => ({
+      versions: (file.versions ?? []).map((v: PrismaFileVersion) => ({
         id: v.id,
         key: v.key,
         size: v.size,
@@ -509,11 +517,11 @@ export class StorageService {
         scanStatus: v.scanStatus,
         scanResult: v.scanResult,
       })),
-      sharedWith: file.sharedWith?.map((s: any) => ({
+      sharedWith: (file.sharedWith ?? []).map((s: PrismaFileShare) => ({
         id: s.id,
         userId: s.userId,
         sharedById: s.sharedById,
-        permission: s.permission as SharePermission,
+        permission: s.permission,
         sharedAt: s.sharedAt,
         expiresAt: s.expiresAt ?? undefined,
       })),
